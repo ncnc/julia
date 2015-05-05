@@ -52,11 +52,14 @@ unstaged(; dir="") = !success(`diff-files --quiet`, dir=dir)
 dirty(paths; dir="") = !success(`diff-index --quiet HEAD -- $paths`, dir=dir)
 staged(paths; dir="") = !success(`diff-index --quiet --cached HEAD -- $paths`, dir=dir)
 unstaged(paths; dir="") = !success(`diff-files --quiet -- $paths`, dir=dir)
-
 iscommit(name; dir="") = success(`cat-file commit $name`, dir=dir)
 attached(; dir="") = success(`symbolic-ref -q HEAD`, dir=dir)
 branch(; dir="") = readchomp(`rev-parse --symbolic-full-name --abbrev-ref HEAD`, dir=dir)
 head(; dir="") = readchomp(`rev-parse HEAD`, dir=dir)
+
+function iscommit(sha1s::Array{ASCIIString}; dir="")
+    indexin(sha1s,split(readchomp(`log --all --format=%H`, dir=dir),"\n")).!=0
+end
 
 immutable State
     head::ASCIIString
